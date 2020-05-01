@@ -3,20 +3,22 @@ Created on Fri May 01 08:31:22 2020
 @author: Harshil Bhatt
 '''
 
-import socket
+import nmap
 
-t_host = str(input("Enter the host to be scanned: "))
-t_ip = socket.gethostbyname(t_host)
+# Initialise port scanner
+nmScan = nmap.PortScanner()
 
-print(t_ip)
+# scan localhost on ports 21 to 443
+nmScan.scan('127.0.0.1', '21-443')
 
-while True:
-    t_port = int(input("Enter port to be scanned: "))
-
-    try:
-        sock = socket.socket()
-        res = sock.connect((t_ip, t_port))
-        print("Port {}: Open".format(t_port))
-        sock.close()
-    except:
-        print("Port {}: Closed".format(t_port))
+for host in nmScan.all_hosts():
+    print("Host: %s %s" % (host, (nmScan[host].hostname())))
+    print("State: %s" % nmScan[host].state())
+    for proto in nmScan[host].all_protocols():
+        print("--------")
+        print('Protocol : %s' % proto)
+ 
+        lport = nmScan[host][proto].keys()
+        sorted(lport)
+        for port in lport:
+           print ('port : %s\tstate : %s' % (port, nmScan[host][proto][port]['state']))
