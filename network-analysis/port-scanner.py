@@ -4,21 +4,40 @@ Created on Fri May 01 08:31:22 2020
 '''
 
 import nmap
+import optparse
 
-# Initialise port scanner
-nmScan = nmap.PortScanner()
+# defining nmap scan function with arguments
+# tgtHost will hold the host value and tgtPort will hold the port value
+def nmapScan(tgtHost, tgtPort):
+    nmScan = nmap.PortScanner()
+    nmScan.scan(tgtHost, tgtPort)
+    state = nmScan[tgtHost]['tcp'][int(tgtPort)]['state']
+    print("[*] " + tgtHost + "tcp/" + tgtPort + " " + state)
 
-# scan localhost on ports 21 to 443
-nmScan.scan('127.0.0.1', '21-443')
+def main():
+    parser = optparse.OptionParser('Script Usage:'+'-H <target host> -p <target port>')
+    
+    parser.add_option('-H', dest='tgtHost', type='string', 
+    help='specify target host')
 
-for host in nmScan.all_hosts():
-    print("Host: %s %s" % (host, (nmScan[host].hostname())))
-    print("State: %s" % nmScan[host].state())
-    for proto in nmScan[host].all_protocols():
-        print("--------")
-        print('Protocol : %s' % proto)
- 
-        lport = nmScan[host][proto].keys()
-        sorted(lport)
-        for port in lport:
-           print ('port : %s\tstate : %s' % (port, nmScan[host][proto][port]['state']))
+    parser.add_option('-p', dest='tgtPort', type='string', 
+    help='specify target port[s] separated by comma')
+
+    (options,args) = parser.parse_args()
+    tgtHost = options.tgtHost
+    tgtPorts = str(options.tgtPort)
+    
+    print(tgtPorts)
+    
+    if (tgtHost == None) | (tgtPorts[0] == None):
+        print(parser.usage)
+        exit(0)
+        
+    ports = tgtPorts.strip("'").split(',')
+    
+    for tgtPort in ports:
+        print(tgtHost+ " " +tgtPort)
+        nmapScan(tgtHost, tgtPort)
+
+if __name__ == '__main__':
+        main()
