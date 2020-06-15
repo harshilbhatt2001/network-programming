@@ -202,7 +202,7 @@ main (int argc, char *argv[])
     "/$ns3::MobilityModel/CourseChange";
     Config::Connect (oss.str (), MakeCallback (&CourseChange));
     
-    if (tracing)
+    if (netanim)
     {    
         AnimationInterface anim("NetAnim_Simulation_Files/wireless_topo.xml");
         anim.SetConstantPosition(csmaNodes.Get(0), 10.0, 10.0);
